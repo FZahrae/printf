@@ -1,24 +1,19 @@
 #include "main.h"
 
-/************************* PRINT CHAR *************************/
-
+/************************* PRINT A CHAR *************************/
 /**
- * print_char - Prints a char
+ * print_string - Prints a string
  * @types: List a of arguments
  * @buffer: Buffer array to handle print
  * @flags:  Calculates active flags
- * @width: Width
+ * @width: get width.
  * @precision: Precision specification
  * @size: Size specifier
  * Return: Number of chars printed
  */
-int print_char(va_list types, char buffer[],
-	int flags, int width, int precision, int size)
-{
-	char c = va_arg(types, int);
 
-	return (handle_write_char(c, buffer, flags, width, precision, size));
-}
+
+
 /************************* PRINT A STRING *************************/
 /**
  * print_string - Prints a string
@@ -97,6 +92,7 @@ int print_percent(va_list types, char buffer[],
 	return (write(1, "%%", 1));
 }
 
+
 /************************* PRINT INT *************************/
 /**
  * print_int - Print int
@@ -108,15 +104,14 @@ int print_percent(va_list types, char buffer[],
  * @size: Size specifier
  * Return: Number of chars printed
  */
-int print_int(va_list types, char buffer[],
-	int flags, int width, int precision, int size)
+int print_int(va_list types, char buffer[])
 {
 	int i = BUFF_SIZE - 2;
 	int is_negative = 0;
 	long int n = va_arg(types, long int);
 	unsigned long int num;
 
-	n = convert_size_number(n, size);
+	n = convert_size_number(n);
 
 	if (n == 0)
 		buffer[i--] = '0';
@@ -138,7 +133,7 @@ int print_int(va_list types, char buffer[],
 
 	i++;
 
-	return (write_number(is_negative, i, buffer, flags, width, precision, size));
+	return (write_number(is_negative, i));
 }
 
 /************************* PRINT BINARY *************************/
@@ -185,4 +180,63 @@ int print_binary(va_list types, char buffer[],
 		}
 	}
 	return (count);
+}
+
+/************************CONVERT NUMBER TO SIZE********************/
+/**
+ * convert_size_number - adds an int to a buffer
+ * @i: int to be converted.
+ * 
+ * Return: size.
+ */
+int convert_size_number(int i)
+{
+	int t = 10000000;
+	int digs = 0;
+	int flg = 0;
+
+	while (t > 0)
+	{
+		if ((i / t) % 10 > 0 || flg == 1)
+		{
+			digs++;
+			flg = 1;
+		}
+		t = t / 10;
+	}
+	return (digs * 4);
+}
+
+/*******************WRITE NUMBER******************************/
+/**
+ * write_number - adds an int to a buffer
+ * @is_positive: is 1 if 
+ * @i: int to be converted.
+ * 
+ * Return: size.
+ */
+int write_number(int is_negative, int i)
+{
+	int t = 10000000;
+	int digs = 0;
+	int flg = 0;
+	char *p[BUFF_SIZE];
+
+	if (is_negative == 1)
+	{
+		p[digs] = 45;
+		digs++;
+	}
+	while (t > 0)
+	{
+		if ((i / t) % 10 > 0 || flg == 1)
+		{
+			p[digs] = ((i / t) % 10) + 48;
+			digs++;
+			flg = 1;
+		}
+		t = t / 10;
+	}
+	write(1, p, digs);
+	return (1);
 }
